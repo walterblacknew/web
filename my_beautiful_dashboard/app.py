@@ -3,54 +3,54 @@ import requests
 
 app = Flask(__name__)
 
-# در این مثال، به سادگی از یک متغیر سراسری لیستی برای ذخیره داده‌ها استفاده شده.
-# در عمل، بهتر است از دیتابیس (مثلاً SQLite/PostgreSQL) استفاده کنید.
+# In-memory list to store incoming webhook data (for demonstration)
 ALL_RESPONSES = []
 
 @app.route("/webhook", methods=["POST"])
 def porsline_webhook():
     """
-    وبهوکی که پرس‌لاین درخواست POST با داده‌های پاسخ‌های جدید را به آن ارسال می‌کند.
+    Webhook endpoint that Porsline will POST to
+    whenever a new response (or event) occurs.
     """
-    data = request.get_json()  # دریافت داده‌های JSON
+    data = request.get_json()
     if not data:
         return jsonify({"error": "No JSON provided"}), 400
     
-    # نمونه‌ای از داده‌هایی که ممکن است از پرس‌لاین دریافت کنید (بسته به مستندات):
-    # {
-    #   "form_id": 123,
-    #   "response_id": "abc-xyz",
-    #   "submitted_at": "2023-12-01T10:00:00Z",
-    #   "answers": {
-    #       "question_1": "پاسخ 1",
-    #       "question_2": "پاسخ 2",
-    #       ...
-    #   }
-    # }
-    
-    # داده را به لیست سراسری اضافه می‌کنیم
+    # Append the incoming data to our in-memory list
     ALL_RESPONSES.append(data)
     
-    # پاسخ موفقیت‌آمیز به پرس‌لاین
+    # Return a success response to Porsline
     return jsonify({"status": "ok"}), 200
 
-@app.route("/dashboard")
+@app.route("/dashboard", methods=["GET"])
 def dashboard():
     """
-    نمایش یک داشبورد زیبا برای مشاهده و فیلتر کردن پاسخ‌ها.
+    A beautiful dashboard displaying the collected responses 
+    in a searchable, filterable table (using DataTables).
     """
-    # در اینجا می‌توانیم به صورت پویا ALL_RESPONSES را به قالب ارسال کنیم
     return render_template("dashboard.html", responses=ALL_RESPONSES)
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
     """
-    صفحه اول را می‌توانیم ریدایرکت کنیم به داشبورد
+    Root route:
+    - GET: simple welcome page with a link to /dashboard
+    - POST: now allowed, so we won't get a 405 if a POST request is sent here
     """
-    return '''
-    <h2>Welcome to the Beautiful Dashboard</h2>
-    <p>برای مشاهده‌ی داشبورد <a href="/dashboard">کلیک کنید</a>.</p>
-    '''
+    if request.method == "POST":
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No JSON provided"}), 400
+        
+        # You can decide what to do with POST data at the root.
+        # For now, just return it back as a JSON response.
+        return jsonify({"status": "Data received at root", "data": data}), 200
+    else:
+        return '''
+        <h2>Welcome to the Beautiful Dashboard</h2>
+        <p>برای مشاهده‌ی داشبورد <a href="/dashboard">کلیک کنید</a>.</p>
+        '''
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    # Run on the Flask development server with debug mode
+    app.run(debug=True, host="0.0.0.0", port=5000)
