@@ -18,7 +18,6 @@
         <td>{{ item.get("form_id", "-") }}</td>
         <td>{{ item.get("response_id", "-") }}</td>
         <td>{{ item.get("submitted_at", "-") }}</td>
-        <!-- می‌توانید این بخش را جزئی‌تر نمایش دهید -->
         <td>
           <pre class="m-0">{{ item.get("answers") | tojson(indent=2) }}</pre>
         </td>
@@ -33,7 +32,7 @@
 {{ super() }}
 <script>
   $(document).ready(function() {
-    // ایجاد DataTable
+    // Initialize DataTables
     let table = $('#responsesTable').DataTable({
       paging: true,
       searching: true,
@@ -51,16 +50,15 @@
       }
     });
     
-    // افزودن یک جعبه جستجو برای هر ستون در هدر جدول
-    // (در DataTables معمولاً از روش append کردن input به each th استفاده می‌شود)
+    // Add a column-specific search box to each column in the thead
     $('#responsesTable thead th').each(function () {
-      var title = $(this).text();
-      $(this).append('<br/><input type="text" class="col-search" placeholder="جستجو در '+title+'" />');
+      let title = $(this).text();
+      $(this).append('<br><input type="text" class="col-search" placeholder="جستجو در '+title+'" />');
     });
     
-    // اعمال جستجو در ستون به ستون
+    // Apply the search
     table.columns().every(function () {
-      var that = this;
+      let that = this;
       $('input', this.header()).on('keyup change', function () {
         if (that.search() !== this.value) {
           that.search(this.value).draw();
