@@ -1,0 +1,20 @@
+/* نمونه ساده برای افزایش خوانایی */
+body {
+    font-family: Vazir, sans-serif; /* اگر فونت فارسی دارید */
+  }
+  
+  pre {
+    background: #f1f1f1;
+    padding: 8px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    direction: ltr; /* برای محتوای JSON انگلیسی */
+  }
+  
+  /* اگر بخواهید ظاهر inputهای جستجو را کمی شخصی‌سازی کنید */
+  #responsesTable thead input.col-search {
+    width: 100%;
+    font-size: 0.8rem;
+    box-sizing: border-box;
+  }
+  
